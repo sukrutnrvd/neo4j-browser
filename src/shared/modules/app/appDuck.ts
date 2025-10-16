@@ -55,10 +55,7 @@ export const inWebBrowser = (state: GlobalState): boolean =>
 export const inDesktop = (state: GlobalState): boolean =>
   getEnv(state) === DESKTOP
 
-export const getAllowedBoltSchemes = (
-  state: GlobalState,
-  encryptionFlag?: any
-) => {
+export const getAllowedBoltSchemes = (state: GlobalState) => {
   const isHosted = inWebBrowser(state)
   const hostedUrl = getHostedUrl(state)
   return [...SECURE_SCHEMES, ...INSECURE_SCHEMES]

@@ -1,3 +1,28 @@
+import {
+  APP_START,
+  CLOUD_SCHEMES,
+  USER_CLEAR,
+  getAllowedBoltSchemes,
+  getHostedUrl,
+  hasDiscoveryEndpoint,
+  inDesktop
+} from 'shared/modules/app/appDuck'
+import { AUTH_STORAGE_CONNECT_HOST, isCloudHost } from 'shared/services/utils'
+import {
+  authLog,
+  authRequestForSSO,
+  defaultSearchParamsToRemoveAfterAutoRedirect,
+  getSSOServerIdIfShouldRedirect,
+  handleAuthFromRedirect,
+  removeSearchParamsInBrowserHistory,
+  wasRedirectedBackFromSSOServer
+} from 'neo4j-client-sso'
+import {
+  getConnection,
+  updateConnection
+} from 'shared/modules/connections/connectionsDuck'
+
+import { NEO4J_CLOUD_DOMAINS } from 'shared/modules/settings/settingsDuck'
 /*
  * Copyright (c) "Neo4j"
  * Neo4j Sweden AB [http://neo4j.com]
@@ -18,33 +43,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { URL } from 'whatwg-url'
-import {
-  authLog,
-  authRequestForSSO,
-  defaultSearchParamsToRemoveAfterAutoRedirect,
-  getSSOServerIdIfShouldRedirect,
-  handleAuthFromRedirect,
-  removeSearchParamsInBrowserHistory,
-  wasRedirectedBackFromSSOServer
-} from 'neo4j-client-sso'
-
-import { getAndMergeDiscoveryData } from './discoveryHelpers'
 import { generateBoltUrl } from 'services/boltscheme.utils'
-import {
-  APP_START,
-  CLOUD_SCHEMES,
-  USER_CLEAR,
-  getAllowedBoltSchemes,
-  getHostedUrl,
-  hasDiscoveryEndpoint,
-  inDesktop
-} from 'shared/modules/app/appDuck'
-import {
-  getConnection,
-  updateConnection
-} from 'shared/modules/connections/connectionsDuck'
-import { NEO4J_CLOUD_DOMAINS } from 'shared/modules/settings/settingsDuck'
-import { AUTH_STORAGE_CONNECT_HOST, isCloudHost } from 'shared/services/utils'
+import { getAndMergeDiscoveryData } from './discoveryHelpers'
 
 export const NAME = 'discover-bolt-host'
 export const CONNECTION_ID = '$$discovery'
@@ -93,14 +93,10 @@ export const getBoltHost = (state: any) => {
   return state.discovery.boltHost
 }
 
-const getAllowedBoltSchemesForHost = (
-  state: any,
-  host: string,
-  encryptionFlag?: any
-) =>
+const getAllowedBoltSchemesForHost = (state: any, host: string) =>
   isCloudHost(host, NEO4J_CLOUD_DOMAINS)
     ? CLOUD_SCHEMES
-    : getAllowedBoltSchemes(state, encryptionFlag)
+    : getAllowedBoltSchemes(state)
 
 const updateDiscoveryState = (action: any, store: any) => {
   const keysToCopy = [
@@ -128,11 +124,7 @@ export const injectDiscoveryEpic = (action$: any, store: any) =>
     .ofType(INJECTED_DISCOVERY)
     .map((action: any) => {
       const connectUrl = generateBoltUrl(
-        getAllowedBoltSchemesForHost(
-          store.getState(),
-          action.host,
-          action.encrypted
-        ),
+        getAllowedBoltSchemesForHost(store.getState(), action.host),
         action.host
       )
       return updateDiscoveryState({ ...action, forceUrl: connectUrl }, store)
