@@ -65,9 +65,7 @@ export const getAllowedBoltSchemes = (
     ? encryptionFlag
       ? SECURE_SCHEMES
       : [...SECURE_SCHEMES, ...INSECURE_SCHEMES]
-    : (hostedUrl || '').startsWith('https')
-    ? SECURE_SCHEMES
-    : INSECURE_SCHEMES
+    : [...SECURE_SCHEMES, ...INSECURE_SCHEMES]
 }
 // currently only Desktop specific
 export const isRelateAvailable = (state: GlobalState): boolean =>
