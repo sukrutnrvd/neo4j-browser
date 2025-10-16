@@ -93,10 +93,8 @@ export const getBoltHost = (state: any) => {
   return state.discovery.boltHost
 }
 
-const getAllowedBoltSchemesForHost = (state: any, host: string) =>
-  isCloudHost(host, NEO4J_CLOUD_DOMAINS)
-    ? CLOUD_SCHEMES
-    : getAllowedBoltSchemes(state)
+const getAllowedBoltSchemesForHost = (state: any, _host: string) =>
+  getAllowedBoltSchemes(state)
 
 const updateDiscoveryState = (action: any, store: any) => {
   const keysToCopy = [
