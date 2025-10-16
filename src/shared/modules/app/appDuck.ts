@@ -61,11 +61,7 @@ export const getAllowedBoltSchemes = (
 ) => {
   const isHosted = inWebBrowser(state)
   const hostedUrl = getHostedUrl(state)
-  return !isHosted
-    ? encryptionFlag
-      ? SECURE_SCHEMES
-      : [...SECURE_SCHEMES, ...INSECURE_SCHEMES]
-    : [...SECURE_SCHEMES, ...INSECURE_SCHEMES]
+  return [...SECURE_SCHEMES, ...INSECURE_SCHEMES]
 }
 // currently only Desktop specific
 export const isRelateAvailable = (state: GlobalState): boolean =>
